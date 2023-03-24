@@ -134,22 +134,28 @@ public class NewBingGoGoServer extends NanoWSD {
             // 判断当前字符是否需要转义
             switch (c) {
                 // 如果是双引号或反斜杠，添加一个反斜杠作为前缀
-                case '"', '\\' -> {
+                case '"': case '\\':{
                     output.append('\\');
                     output.append(c);
+                    break;
                 }
                 // 如果是换行符，添加一个反斜杠和一个n作为替代
-                case '\n' -> {
+                case '\n':{
                     output.append('\\');
                     output.append('n');
+                    break;
                 }
                 // 如果是制表符，添加一个反斜杠和一个t作为替代
-                case '\t' -> {
+                case '\t':{
                     output.append('\\');
                     output.append('t');
+                    break;
                 }
                 // 其他情况下，直接添加当前字符
-                default -> output.append(c);
+                default :{
+                    output.append(c);
+                    break;
+                }
             }
         }
         // 返回转义后的字符串
