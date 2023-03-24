@@ -61,8 +61,12 @@ public class NewBingGoGoServer extends NanoWSD {
                 urlConnection.addRequestProperty(s,v);
             }
 
+            Response.Status status = Response.Status.lookup(urlConnection.getResponseCode());
+            if(status==null){
+                status =  Response.Status.INTERNAL_ERROR;
+            }
             return NanoHTTPD.newFixedLengthResponse(
-                    new IStatus(urlConnection.getResponseCode(),urlConnection.getResponseMessage()),
+                    status,
                     "application/json",
                     urlConnection.getInputStream(),
                     urlConnection.getContentLengthLong()
@@ -93,8 +97,12 @@ public class NewBingGoGoServer extends NanoWSD {
                 urlConnection.addRequestProperty(s,v);
             }
 
+            Response.Status status = Response.Status.lookup(urlConnection.getResponseCode());
+            if(status==null){
+                status =  Response.Status.INTERNAL_ERROR;
+            }
             return NanoHTTPD.newFixedLengthResponse(
-                    new IStatus(urlConnection.getResponseCode(),urlConnection.getResponseMessage()),
+                    status,
                     "application/json",
                     urlConnection.getInputStream(),
                     urlConnection.getContentLengthLong()
@@ -102,26 +110,6 @@ public class NewBingGoGoServer extends NanoWSD {
         } catch (IOException e) {
             String r = "{\"result\":{\"value\":\"error\",\"message\":\""+escapeJsonString(e.toString())+"\"}}";
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,"application/json",r);
-        }
-    }
-
-    public static class IStatus implements NanoHTTPD.Response.IStatus{
-        String description;
-        int status;
-
-        public IStatus(int status,String description) {
-            this.description = description;
-            this.status = status;
-        }
-
-        @Override
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public int getRequestStatus() {
-            return status;
         }
     }
     public static String escapeJsonString(String input) {
