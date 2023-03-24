@@ -55,7 +55,7 @@ public class NewBingGoGoServer extends NanoWSD {
             urlConnection.setConnectTimeout(3000);
 
             Map<String,String> headers = session.getHeaders();
-            String[] b = {"cookie","user-agent"};
+            String[] b = {"cookie","user-agent","accept","accept-language"};
             for (String s : b) {
                 String v = headers.get(s);
                 urlConnection.addRequestProperty(s,v);
@@ -91,7 +91,7 @@ public class NewBingGoGoServer extends NanoWSD {
             urlConnection.setConnectTimeout(3000);
 
             Map<String,String> headers = session.getHeaders();
-            String[] b = {"cookie","user-agent"};
+            String[] b = {"cookie","user-agent","accept","accept-language"};
             for (String s : b) {
                 String v = headers.get(s);
                 urlConnection.addRequestProperty(s,v);
