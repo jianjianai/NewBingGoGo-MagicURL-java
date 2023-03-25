@@ -19,6 +19,7 @@ public class NewBingGoGoServer extends NanoWSD {
         }
         try{
             int porint = Integer.parseInt(args[0]);
+            System.out.println("程序已在"+porint+"端口上启动.");
             new NewBingGoGoServer(porint).start(5000,false);
         }catch(Throwable s){
             s.printStackTrace();
