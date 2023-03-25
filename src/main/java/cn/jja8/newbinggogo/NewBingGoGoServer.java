@@ -13,7 +13,16 @@ import java.util.concurrent.ScheduledExecutorService;
 public class NewBingGoGoServer extends NanoWSD {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     public static void main(String[] args) throws IOException {
-        new NewBingGoGoServer(8080).start(5000,false);
+        if(args.length<1){
+            System.err.print("需要指定运行端口号！");
+            return;
+        }
+        try{
+            int porint = Integer.parseInt(args[0]);
+            new NewBingGoGoServer(porint).start(5000,false);
+        }catch(Throwable s){
+            s.printStackTrace();
+        }
     }
     public NewBingGoGoServer(int port) {
         super(port);
