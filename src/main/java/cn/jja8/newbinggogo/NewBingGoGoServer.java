@@ -6,14 +6,26 @@ import fi.iki.elonen.NanoWSD;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.BiConsumer;
 
 public class NewBingGoGoServer extends NanoWSD {
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     public static void main(String[] args) throws IOException {
-        new NewBingGoGoServer(8080).start(5000,false);
+        if(args.length<1){
+            System.err.print("需要指定运行端口号！");
+            return;
+        }
+        try{
+            int porint = Integer.parseInt(args[0]);
+            System.out.println("程序已在"+porint+"端口上启动.");
+            new NewBingGoGoServer(porint).start(5000,false);
+        }catch(Throwable s){
+            s.printStackTrace();
+        }
     }
     public NewBingGoGoServer(int port) {
         super(port);
@@ -25,11 +37,31 @@ public class NewBingGoGoServer extends NanoWSD {
         if(url.startsWith("/ChatHub")){
             return super.serve(session);
         }
-        if(url.startsWith("/Create")){
-            return bingCreate(session);
+        if(url.startsWith("/Create")){//创建聊天
+            return goUrl(session,"https://www.bing.com/turing/conversation/create");
         }
-        if(url.startsWith("/bingcopilotwaitlist")){
-            return bingcopilotwaitlist(session);
+        if(url.startsWith("/bingcopilotwaitlist")){//加入候补
+            return goUrl(session,"https://www.bing.com/msrewards/api/v1/enroll?publ=BINGIP&crea=MY00IA&pn=bingcopilotwaitlist&partnerId=BingRewards&pred=true&wtc=MktPage_MY0291");
+        }
+        if(url.startsWith("/AiDraw/Create")){
+            HashMap<String,String> he = new HashMap<>();
+            he.put("sec-fetch-site","same-origin");
+            he.put("referer","https://www.bing.com/search?q=bingAI");
+            Response re =  goUrl(session,"https://www.bing.com/images/create?"+session.getQueryParameterString(),he);
+            re.setMimeType("text/html");
+            return re;
+        }
+        if(url.startsWith("/images/create/async/results")){
+            String gogoUrl = url.replace("/images/create/async/results","https://www.bing.com/images/create/async/results");
+            gogoUrl = gogoUrl+"?"+session.getQueryParameterString();
+ //           /641f0e9c318346378e94e495ab61a703?q=a+dog&partner=sydney&showselective=1
+
+            HashMap<String,String> he = new HashMap<>();
+            he.put("sec-fetch-site","same-origin");
+            he.put("referer","https://www.bing.com/images/create?partner=sydney&showselective=1&sude=1&kseed=7000");
+            Response re = goUrl(session, gogoUrl,he);
+            re.setMimeType("text/html");
+            return re;
         }
         String r = "{\"result\":{\"value\":\"error\",\"message\":\"由于NewBing策略更新，请更新NewBingGoGo到2023.3.23V2版本以上。\"}}";
         return newFixedLengthResponse(Response.Status.OK,"application/json",r);
@@ -41,11 +73,14 @@ public class NewBingGoGoServer extends NanoWSD {
     }
 
     /*
-     * 创建的api
+     * 转发请求
      */
-    public static NanoHTTPD.Response bingCreate(NanoHTTPD.IHTTPSession session){
+    public static NanoHTTPD.Response goUrl(NanoHTTPD.IHTTPSession session,String stringUrl){
+        return goUrl(session,stringUrl,new HashMap<>(1));
+    }
+    public static NanoHTTPD.Response goUrl(NanoHTTPD.IHTTPSession session,String stringUrl,Map<String,String> headers){
         try {
-            URL url = new URL("https://www.bing.com/turing/conversation/create");
+            URL url = new URL(stringUrl);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.setDoOutput(false);
@@ -54,12 +89,13 @@ public class NewBingGoGoServer extends NanoWSD {
             urlConnection.setInstanceFollowRedirects(true);
             urlConnection.setConnectTimeout(3000);
 
-            Map<String,String> headers = session.getHeaders();
+            Map<String,String> header = session.getHeaders();
             String[] b = {"cookie","user-agent","accept","accept-language"};
             for (String s : b) {
-                String v = headers.get(s);
+                String v = header.get(s);
                 urlConnection.addRequestProperty(s,v);
             }
+            headers.forEach(urlConnection::addRequestProperty);
 
             Response.Status status = Response.Status.lookup(urlConnection.getResponseCode());
             if(status==null){
@@ -76,42 +112,8 @@ public class NewBingGoGoServer extends NanoWSD {
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,"application/json",r);
         }
     }
-    /*
-     * 加入候补
-     */
-    public static NanoHTTPD.Response bingcopilotwaitlist(NanoHTTPD.IHTTPSession session){
-        try {
-            URL url = new URL("https://www.bing.com/msrewards/api/v1/enroll?publ=BINGIP&crea=MY00IA&pn=bingcopilotwaitlist&partnerId=BingRewards&pred=true&wtc=MktPage_MY0291");
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(false);
-            urlConnection.setDoInput(true);
-            urlConnection.setUseCaches(true);
-            urlConnection.setInstanceFollowRedirects(true);
-            urlConnection.setConnectTimeout(3000);
 
-            Map<String,String> headers = session.getHeaders();
-            String[] b = {"cookie","user-agent","accept","accept-language"};
-            for (String s : b) {
-                String v = headers.get(s);
-                urlConnection.addRequestProperty(s,v);
-            }
 
-            Response.Status status = Response.Status.lookup(urlConnection.getResponseCode());
-            if(status==null){
-                status =  Response.Status.INTERNAL_ERROR;
-            }
-            return NanoHTTPD.newFixedLengthResponse(
-                    status,
-                    "application/json",
-                    urlConnection.getInputStream(),
-                    urlConnection.getContentLengthLong()
-            );
-        } catch (IOException e) {
-            String r = "{\"result\":{\"value\":\"error\",\"message\":\""+escapeJsonString(e.toString())+"\"}}";
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,"application/json",r);
-        }
-    }
     public static String escapeJsonString(String input) {
         // 创建一个StringBuilder对象，用于存储转义后的字符串
         StringBuilder output = new StringBuilder();
