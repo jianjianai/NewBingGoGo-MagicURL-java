@@ -37,7 +37,7 @@ public class NewBingGoGoServer extends NanoWSD {
     public Response serve(IHTTPSession session) {
         String ip = session.getHeaders().get("x-forwarded-for");
         if (ip==null){
-            ip = session.getRemoteIpAddress();
+            ip = "未知ip地址";
         }
         ip = new Date()+":"+ip;
 
@@ -134,21 +134,18 @@ public class NewBingGoGoServer extends NanoWSD {
         } catch (IOException e) {
             return getReturnError(e);
         }
-        //获取请求状态代码
-        Response.Status status;
-        try {
-            status = Response.Status.lookup(urlConnection.getResponseCode());
+        int code;
+        try{
+            code = urlConnection.getResponseCode();
         } catch (IOException e) {
-            urlConnection.disconnect();
             return getReturnError(e);
         }
-        if(Response.Status.TOO_MANY_REQUESTS.equals(status)){
+        //获取请求状态代码
+        if(code!=200){
             urlConnection.disconnect();
-            return getReturnError("此魔法链接服务器请求过多，被bing拒绝！请稍后再试。 |"+status.getDescription(),null,false);
+            return getReturnError("此魔法链接服务器请求被bing拒绝！请稍后再试。错误代码:"+code,null,false);
         }
-        if(status==null){
-            status =  Response.Status.INTERNAL_ERROR;
-        }
+
         //将数据全部读取然后关闭流和链接
         int len = urlConnection.getContentLength();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(Math.max(len, 0));
@@ -168,7 +165,7 @@ public class NewBingGoGoServer extends NanoWSD {
         //创建用于输出的流
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
         return NanoHTTPD.newFixedLengthResponse(
-                status,
+                Response.Status.OK,
                 "application/json",
                 byteArrayInputStream,
                 len
