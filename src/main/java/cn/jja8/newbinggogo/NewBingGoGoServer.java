@@ -132,7 +132,7 @@ public class NewBingGoGoServer extends NanoWSD {
         }
         if(Response.Status.TOO_MANY_REQUESTS.equals(status)){
             urlConnection.disconnect();
-            return getReturnError("请求过多，被bing拒绝！请稍后再试。 |"+status.getDescription(),null,false);
+            return getReturnError("此魔法链接服务器请求过多，被bing拒绝！请稍后再试。 |"+status.getDescription(),null,false);
         }
         if(status==null){
             status =  Response.Status.INTERNAL_ERROR;
