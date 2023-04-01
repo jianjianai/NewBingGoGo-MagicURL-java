@@ -10,8 +10,11 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class NewBingGoGoServer extends NanoWSD {
+    ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     public static void main(String[] args) {
         if(args.length<1){
             System.err.print("需要指定运行端口号！");
@@ -67,7 +70,7 @@ public class NewBingGoGoServer extends NanoWSD {
 
     @Override
     protected WebSocket openWebSocket(IHTTPSession handshake) {
-        return new NewBingGoGoServerWebSocket(handshake);
+        return new NewBingGoGoServerWebSocket(handshake,scheduledExecutorService);
     }
 
     /*

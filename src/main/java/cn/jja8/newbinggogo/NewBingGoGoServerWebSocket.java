@@ -7,11 +7,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
     NewBingGoGoClientWebSocket newBingGoGoClientWebSocket;
     LinkedList<String> messList = new LinkedList<>();
-    public NewBingGoGoServerWebSocket(NanoHTTPD.IHTTPSession handshakeRequest) {
+    ScheduledExecutorService scheduledExecutorService;
+    ScheduledFuture<?> task;
+
+    public NewBingGoGoServerWebSocket(NanoHTTPD.IHTTPSession handshakeRequest, ScheduledExecutorService scheduledExecutorService) {
         super(handshakeRequest);
         URI url;
         try {
@@ -19,12 +25,23 @@ public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);//这个异常这辈子都不会出的
         }
-
+        this.scheduledExecutorService = scheduledExecutorService;
         newBingGoGoClientWebSocket = new NewBingGoGoClientWebSocket(url,this,messList);
     }
 
     @Override
     protected void onOpen() {
+        task = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+            if (!isOpen()) {
+                task.cancel(false);
+                return;
+            }
+            try {
+                ping(new byte[1]);
+            } catch (IOException e) {
+                task.cancel(false);
+            }
+        },2,2, TimeUnit.SECONDS);
         newBingGoGoClientWebSocket.connect();
     }
 
