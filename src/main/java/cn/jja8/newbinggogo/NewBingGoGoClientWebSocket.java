@@ -4,6 +4,7 @@ import fi.iki.elonen.NanoWSD;
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.Framedata;
+import org.java_websocket.framing.PingFrame;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
@@ -27,13 +28,13 @@ public class NewBingGoGoClientWebSocket extends WebSocketClient {
     }
 
     @Override
-    public void onWebsocketPong(WebSocket conn, Framedata f) {
+    public void onWebsocketPing(WebSocket conn, Framedata f) {
+        super.onWebsocketPing(conn,f);
         try {
-            newBingGoGoServerWebSocket.ping(new byte[1]);
+            newBingGoGoServerWebSocket.ping(new byte[0]);
         } catch (IOException e) {
             close();
         }
-
     }
 
     @Override
