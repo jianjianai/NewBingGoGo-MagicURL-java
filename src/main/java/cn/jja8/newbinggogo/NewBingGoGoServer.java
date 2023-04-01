@@ -130,6 +130,10 @@ public class NewBingGoGoServer extends NanoWSD {
             urlConnection.disconnect();
             return getReturnError(e);
         }
+        if(Response.Status.TOO_MANY_REQUESTS.equals(status)){
+            urlConnection.disconnect();
+            return getReturnError("此魔法链接服务器请求过多，被bing拒绝！请稍后再试。 |"+status.getDescription(),null,false);
+        }
         if(status==null){
             status =  Response.Status.INTERNAL_ERROR;
         }
@@ -142,7 +146,7 @@ public class NewBingGoGoServer extends NanoWSD {
             }
         }catch (FileNotFoundException e){
             urlConnection.disconnect();
-            return getReturnError("此魔法链接服务器无法创建聊天，创建请求被bing拒绝！",e,false);
+            return getReturnError("此魔法链接服务器无法正常工作，请求被bing拒绝！",e,false);
         }catch (IOException e) {
             urlConnection.disconnect();
             return getReturnError(e);
@@ -170,7 +174,9 @@ public class NewBingGoGoServer extends NanoWSD {
      * */
     public static NanoHTTPD.Response getReturnError(String message,Throwable error,boolean all){
         String r;
-        if(all){
+        if (error==null){
+            r = "{\"result\":{\"value\":\"error\",\"message\":\""+escapeJsonString(message)+"\"}}";
+        }else if(all){
             r = "{\"result\":{\"value\":\"error\",\"message\":\""+escapeJsonString(message+"详情:"+printErrorToString(error))+"\"}}";
         }else {
             r = "{\"result\":{\"value\":\"error\",\"message\":\""+escapeJsonString(message+"详情:"+error)+"\"}}";
