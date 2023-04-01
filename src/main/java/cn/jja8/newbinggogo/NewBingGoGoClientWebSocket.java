@@ -29,12 +29,12 @@ public class NewBingGoGoClientWebSocket extends WebSocketClient {
 
     @Override
     public void onWebsocketPing(WebSocket conn, Framedata f) {
-        super.onWebsocketPing(conn,f);
         try {
             newBingGoGoServerWebSocket.ping(new byte[0]);
         } catch (IOException e) {
             close();
         }
+        super.onWebsocketPing(conn,f);
     }
 
     @Override
