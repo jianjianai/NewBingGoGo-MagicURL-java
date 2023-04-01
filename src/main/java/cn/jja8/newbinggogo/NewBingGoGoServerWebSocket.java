@@ -27,7 +27,6 @@ public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
         }
         this.scheduledExecutorService = scheduledExecutorService;
         newBingGoGoClientWebSocket = new NewBingGoGoClientWebSocket(url,this,messList);
-        System.out.println(handshakeRequest.getRemoteIpAddress()+":创建魔法聊天连接");
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -34,20 +35,27 @@ public class NewBingGoGoServer extends NanoWSD {
 
     @Override
     public Response serve(IHTTPSession session) {
+        String ip = session.getHeaders().get("x-forwarded-for");
+        if (ip==null){
+            ip = session.getRemoteIpAddress();
+        }
+        ip = new Date()+":"+ip;
+
         String url = session.getUri();
         if(url.startsWith("/ChatHub")){
+            System.out.println(ip+":创建魔法聊天连接");
             return super.serve(session);
         }
         if(url.startsWith("/Create")){//创建聊天
-            System.out.println(session.getRemoteIpAddress()+":请求创建聊天");
+            System.out.println(ip+":请求创建聊天");
             return goUrl(session,"https://www.bing.com/turing/conversation/create");
         }
         if(url.startsWith("/bingcopilotwaitlist")){//加入候补
-            System.out.println(session.getRemoteIpAddress()+":请求加入候补");
+            System.out.println(ip+":请求加入候补");
             return goUrl(session,"https://www.bing.com/msrewards/api/v1/enroll?publ=BINGIP&crea=MY00IA&pn=bingcopilotwaitlist&partnerId=BingRewards&pred=true&wtc=MktPage_MY0291");
         }
         if(url.startsWith("/AiDraw/Create")){
-            System.out.println(session.getRemoteIpAddress()+":请求AI画图");
+            System.out.println(ip+":请求AI画图");
             HashMap<String,String> he = new HashMap<>();
             he.put("sec-fetch-site","same-origin");
             he.put("referer","https://www.bing.com/search?q=bingAI");
@@ -56,7 +64,7 @@ public class NewBingGoGoServer extends NanoWSD {
             return re;
         }
         if(url.startsWith("/images/create/async/results")){
-            System.out.println(session.getRemoteIpAddress()+":请求AI画图图片");
+            System.out.println(ip+":请求AI画图图片");
             String gogoUrl = url.replace("/images/create/async/results","https://www.bing.com/images/create/async/results");
             gogoUrl = gogoUrl+"?"+session.getQueryParameterString();
  //           /641f0e9c318346378e94e495ab61a703?q=a+dog&partner=sydney&showselective=1
