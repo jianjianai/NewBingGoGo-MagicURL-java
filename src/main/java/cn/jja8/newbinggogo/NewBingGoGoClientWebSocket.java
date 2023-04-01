@@ -29,7 +29,7 @@ public class NewBingGoGoClientWebSocket extends WebSocketClient {
     @Override
     public void onWebsocketPong(WebSocket conn, Framedata f) {
         try {
-            newBingGoGoServerWebSocket.ping(new byte[0]);
+            newBingGoGoServerWebSocket.ping(new byte[1]);
         } catch (IOException e) {
             close();
         }
