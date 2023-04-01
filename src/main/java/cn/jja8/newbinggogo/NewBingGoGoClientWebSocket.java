@@ -5,6 +5,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.framing.PingFrame;
+import org.java_websocket.framing.PongFrame;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class NewBingGoGoClientWebSocket extends WebSocketClient {
     @Override
     public void onWebsocketPing(WebSocket conn, Framedata f) {
         try {
-            newBingGoGoServerWebSocket.ping(new byte[0]);
+            newBingGoGoServerWebSocket.ping(new byte[16]);
         } catch (IOException e) {
             close();
         }
