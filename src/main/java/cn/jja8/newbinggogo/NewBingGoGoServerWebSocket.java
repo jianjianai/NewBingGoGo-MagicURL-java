@@ -44,7 +44,7 @@ public class NewBingGoGoServerWebSocket extends NanoWSD.WebSocket {
 
     @Override
     protected void onPong(NanoWSD.WebSocketFrame pong) {
-
+        System.out.println("pong!");
     }
 
     @Override
