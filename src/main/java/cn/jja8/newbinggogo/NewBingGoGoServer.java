@@ -70,7 +70,7 @@ public class NewBingGoGoServer extends NanoWSD {
 
     @Override
     protected WebSocket openWebSocket(IHTTPSession handshake) {
-        return new NewBingGoGoClientWebSocket(handshake,executor);
+        return new NewBingGoGoServerWebSocket(handshake,executor);
     }
 
     /*
