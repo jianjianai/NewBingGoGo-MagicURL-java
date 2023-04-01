@@ -139,7 +139,7 @@ public class NewBingGoGoServer extends NanoWSD {
         }
         //将数据全部读取然后关闭流和链接
         int len = urlConnection.getContentLength();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(len);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(Math.max(len, 0));
         try(InputStream inputStream = urlConnection.getInputStream()){
             for (int i = 0; i < len; i++) {
                 byteArrayOutputStream.write(inputStream.read());
