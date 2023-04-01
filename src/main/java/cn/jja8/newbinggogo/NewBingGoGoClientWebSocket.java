@@ -1,21 +1,38 @@
 package cn.jja8.newbinggogo;
 
 import fi.iki.elonen.NanoWSD;
+import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.LinkedList;
 
 public class NewBingGoGoClientWebSocket extends WebSocketClient {
     NewBingGoGoServerWebSocket newBingGoGoServerWebSocket;
-    public NewBingGoGoClientWebSocket(URI serverUri,NewBingGoGoServerWebSocket newBingGoGoServerWebSocket) {
+    LinkedList<String> messList;
+    public NewBingGoGoClientWebSocket(URI serverUri,NewBingGoGoServerWebSocket newBingGoGoServerWebSocket,LinkedList<String> messList) {
         super(serverUri);
         this.newBingGoGoServerWebSocket = newBingGoGoServerWebSocket;
+        this.messList = messList;
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        for (String s : messList) {
+            send(s);
+        }
+    }
+
+    @Override
+    public void onWebsocketPong(WebSocket conn, Framedata f) {
+        try {
+            newBingGoGoServerWebSocket.ping(new byte[0]);
+        } catch (IOException e) {
+            close();
+        }
 
     }
 
