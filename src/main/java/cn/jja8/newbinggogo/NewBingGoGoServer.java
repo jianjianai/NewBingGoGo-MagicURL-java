@@ -42,19 +42,19 @@ public class NewBingGoGoServer extends NanoWSD {
         ip = new Date()+":"+ip;
 
         String url = session.getUri();
-        if(url.startsWith("/ChatHub")){
+        if(url.startsWith("/sydney/ChatHub")){
             System.out.println(ip+":创建魔法聊天连接");
             return super.serve(session);
         }
-        if(url.startsWith("/Create")){//创建聊天
+        if(url.startsWith("/turing/conversation/create")){//创建聊天
             System.out.println(ip+":请求创建聊天");
             return goUrl(session,"https://www.bing.com/turing/conversation/create");
         }
-        if(url.startsWith("/bingcopilotwaitlist")){//加入候补
+        if(url.startsWith("/msrewards/api/v1/enroll")){//加入候补
             System.out.println(ip+":请求加入候补");
-            return goUrl(session,"https://www.bing.com/msrewards/api/v1/enroll?publ=BINGIP&crea=MY00IA&pn=bingcopilotwaitlist&partnerId=BingRewards&pred=true&wtc=MktPage_MY0291");
+            return goUrl(session,"https://www.bing.com/msrewards/api/v1/enroll?"+session.getQueryParameterString());
         }
-        if(url.startsWith("/AiDraw/Create")){
+        if(url.startsWith("/images/create")){
             System.out.println(ip+":请求AI画图");
             HashMap<String,String> he = new HashMap<>();
             he.put("sec-fetch-site","same-origin");
@@ -76,7 +76,7 @@ public class NewBingGoGoServer extends NanoWSD {
             re.setMimeType("text/html");
             return re;
         }
-        String r = "{\"result\":{\"value\":\"error\",\"message\":\"由于NewBing策略更新，请更新NewBingGoGo到2023.3.23V2版本以上。\"}}";
+        String r = "{\"result\":{\"value\":\"error\",\"message\":\"由于NewBing策略更新，请更新NewBingGoGo到2023.4.3版本以上。\"}}";
         return newFixedLengthResponse(Response.Status.OK,"application/json",r);
     }
 
