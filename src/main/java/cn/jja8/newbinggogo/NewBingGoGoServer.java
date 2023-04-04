@@ -42,19 +42,19 @@ public class NewBingGoGoServer extends NanoWSD {
         ip = new Date()+":"+ip;
 
         String url = session.getUri();
-        if(url.startsWith("/sydney/ChatHub")){
+        if(url.equals("/sydney/ChatHub")){
             System.out.println(ip+":创建魔法聊天连接");
             return super.serve(session);
         }
-        if(url.startsWith("/turing/conversation/create")){//创建聊天
+        if(url.equals("/turing/conversation/create")){//创建聊天
             System.out.println(ip+":请求创建聊天");
             return goUrl(session,"https://www.bing.com/turing/conversation/create");
         }
-        if(url.startsWith("/msrewards/api/v1/enroll")){//加入候补
+        if(url.equals("/msrewards/api/v1/enroll")){//加入候补
             System.out.println(ip+":请求加入候补");
             return goUrl(session,"https://www.bing.com/msrewards/api/v1/enroll?"+session.getQueryParameterString());
         }
-        if(url.startsWith("/images/create")){
+        if(url.equals("/images/create")){
             System.out.println(ip+":请求AI画图");
             HashMap<String,String> he = new HashMap<>();
             he.put("sec-fetch-site","same-origin");
@@ -68,7 +68,6 @@ public class NewBingGoGoServer extends NanoWSD {
             String gogoUrl = url.replace("/images/create/async/results","https://www.bing.com/images/create/async/results");
             gogoUrl = gogoUrl+"?"+session.getQueryParameterString();
  //           /641f0e9c318346378e94e495ab61a703?q=a+dog&partner=sydney&showselective=1
-
             HashMap<String,String> he = new HashMap<>();
             he.put("sec-fetch-site","same-origin");
             he.put("referer","https://www.bing.com/images/create?partner=sydney&showselective=1&sude=1&kseed=7000");
