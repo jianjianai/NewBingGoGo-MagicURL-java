@@ -155,7 +155,7 @@ public abstract class NanoHTTPD {
                 // than the expected SocketException OR a
                 // SocketTimeoutException, print the
                 // stacktrace
-                if (!(e instanceof SocketException && "NanoHttpd Shutdown".equals(e.getMessage())) && !(e instanceof SocketTimeoutException)) {
+                if (!(e instanceof SocketException && ("NanoHttpd Shutdown".equals(e.getMessage()) || "Broken pipe".equals(e.getMessage()))) && !(e instanceof SocketTimeoutException)) {
                     NanoHTTPD.LOG.log(Level.SEVERE, "Communication with the client broken, or an bug in the handler code", e);
                 }
             } finally {
