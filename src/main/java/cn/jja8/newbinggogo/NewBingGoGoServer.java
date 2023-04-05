@@ -38,7 +38,7 @@ public class NewBingGoGoServer extends NanoWSD {
         if(!isUser(session)){
             return getReturnError("请求头无user-agent参数，拒绝请求！");
         }
-        String ip = new Date()+getIp(session);
+        String ip = new Date()+":"+getIp(session);
         String url = session.getUri();
         if(url.equals("/turing/conversation/create")){//创建聊天
             System.out.println(ip+":请求创建聊天");
@@ -77,7 +77,7 @@ public class NewBingGoGoServer extends NanoWSD {
         if(!isUser(handshake)){
             return getReturnErrorWebSocket(handshake,"请求头无user-agent参数，拒绝请求！");
         }
-        String ip = new Date()+getIp(handshake);
+        String ip = new Date()+":"+getIp(handshake);
         String url = handshake.getUri();
         if(url.equals("/sydney/ChatHub")){
             System.out.println(ip+":创建魔法聊天连接");
