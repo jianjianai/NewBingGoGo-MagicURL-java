@@ -190,7 +190,7 @@ public class NewBingGoGoServer extends NanoWSD {
 
     //生成随机数
     public static int getRndInteger(int min, int max) {
-        return (int) Math.floor(Math.random() * (max - min + 1) + min);
+        return (int) (Math.random() * (max - min + 1) + min);
     }
 
     public static WebSocket getReturnErrorWebSocket(IHTTPSession session,String error){
