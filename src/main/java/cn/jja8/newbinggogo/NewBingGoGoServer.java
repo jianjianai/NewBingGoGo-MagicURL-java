@@ -35,9 +35,6 @@ public class NewBingGoGoServer extends NanoWSD {
 
     @Override
     public Response serveHttp(IHTTPSession session) {
-        if(!isUser(session)){
-            return getReturnError("请求头无user-agent参数，拒绝请求！");
-        }
         String ip = new Date()+":"+getIp(session);
         String url = session.getUri();
         if(url.equals("/turing/conversation/create")){//创建聊天
@@ -69,14 +66,16 @@ public class NewBingGoGoServer extends NanoWSD {
             re.setMimeType("text/html");
             return re;
         }
+        //用于测试
+        if(url.startsWith("/test/")){
+            String gogoUrl = url.replace("/test/","");
+            return goUrl(session, gogoUrl);
+        }
         return getReturnError("由于NewBing策略更新，请更新NewBingGoGo到2023.4.3版本以上。");
     }
 
     @Override
     protected WebSocket openWebSocket(IHTTPSession handshake) {
-        if(!isUser(handshake)){
-            return getReturnErrorWebSocket(handshake,"请求头无user-agent参数，拒绝请求！");
-        }
         String ip = new Date()+":"+getIp(handshake);
         String url = handshake.getUri();
         if(url.equals("/sydney/ChatHub")){
@@ -86,10 +85,6 @@ public class NewBingGoGoServer extends NanoWSD {
         return getReturnErrorWebSocket(handshake,"请求接口错误！");
     }
 
-    public static boolean isUser(IHTTPSession session){
-        String ua = session.getHeaders().get("user-agent");
-        return ua!=null;
-    }
     public static String getIp(IHTTPSession session){
         String ip = session.getHeaders().get("x-forwarded-for");
         if (ip==null){
@@ -143,6 +138,12 @@ public class NewBingGoGoServer extends NanoWSD {
         //添加指定的头部信息
         addHeaders.forEach(urlConnection::addRequestProperty);
 
+        //添加X-forwarded-for
+        urlConnection.addRequestProperty(
+                "X-forwarded-for",
+                getRndInteger(1,5)+"."+getRndInteger(1,255)+"."+getRndInteger(1,255)+"."+getRndInteger(1,255)
+        );
+
         //建立链接
         try {
             urlConnection.connect();
@@ -185,6 +186,11 @@ public class NewBingGoGoServer extends NanoWSD {
                 byteArrayInputStream,
                 len
         );
+    }
+
+    //生成随机数
+    public static int getRndInteger(int min, int max) {
+        return (int) Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     public static WebSocket getReturnErrorWebSocket(IHTTPSession session,String error){
